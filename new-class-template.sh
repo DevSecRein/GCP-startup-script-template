@@ -59,7 +59,7 @@ cat <<EOF > /var/www/html/index.html
     body,h1,h3 {font-family: "Raleway", sans-serif}
     body, html {height: 100%}
     .bgimg {
-      background-image: url('https://storage.googleapis.com/a-dream/verve.jpg');
+      background-image: url('https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F731f6243-1303-4572-a442-04a1c3baa9f0_1310x859.jpeg');
       min-height: 100%;
       background-position: center;
       background-size: cover;
@@ -83,7 +83,7 @@ cat <<EOF > /var/www/html/index.html
   <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
     <div class="w3-display-topleft w3-padding-large w3-xlarge"></div>
     <div class="w3-display-middle w3-center">
-       <video width="360" height="540" style="border-radius:10px;" controls loop autoplay muted>
+      <video width="360" height="540" style="border-radius:10px;" controls loop autoplay muted>
           <source src="https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/4467b2b5-dc57-4be6-bc33-39d92cd4e0f1/dj2qoeb-56c84c1f-cec7-47e3-876c-e3d2cbe2a967.VideoQualities.res_1080p.5b891286139d4474bad9bda6bfecc970.mp4" type="video/mp4">
           Your browser does not support the video tag.
       </video>
