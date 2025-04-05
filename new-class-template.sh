@@ -59,7 +59,7 @@ cat <<EOF > /var/www/html/index.html
     body,h1,h3 {font-family: "Raleway", sans-serif}
     body, html {height: 100%}
     .bgimg {
-      background-image: url('https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F731f6243-1303-4572-a442-04a1c3baa9f0_1310x859.jpeg');
+      background-image: url('https://i.imgur.com/vm3iG93.jpg');
       min-height: 100%;
       background-position: center;
       background-size: cover;
@@ -107,14 +107,14 @@ cat <<EOF > /var/www/html/index.html
       <p><b>Network Tags:</b> $network_tags</p>
     </div>
     <div class="w3-display-topleft w3-padding-small transparent-background outlined-text">
-  <h1>My VPC Network Information</h1>
-  <h3></h3>
-  <p><b>VPC Name:</b> $network_name</p>
-  <p><b>Subnet Name:</b> $subnet_name</p>
-  <p><b>Subnet Mode:</b> $subnet_mode</p>
-  <p><b>Auto Create Subnets:</b> $auto_create_subnets</p>
-  <p><b>Routing Mode:</b> $routing_mode</p>
-</div>
+      <h1>My VPC Network Information</h1>
+      <h3></h3>
+      <p><b>VPC Name:</b> $network_name</p>
+      <p><b>Subnet Name:</b> $subnet_name</p>
+      <p><b>Subnet Mode:</b> $subnet_mode</p>
+      <p><b>Auto Create Subnets:</b> $auto_create_subnets</p>
+      <p><b>Routing Mode:</b> $routing_mode</p>
+    </div>
   </div>
 </body>
 </html>
