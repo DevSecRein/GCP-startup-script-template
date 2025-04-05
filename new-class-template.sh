@@ -4,6 +4,14 @@
 apt update
 apt install -y apache2
 
+# Install Google Cloud SDK
+apt install -y apt-transport-https ca-certificates gnupg curl
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" \
+  | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+  | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+apt update && apt install -y google-cloud-sdk
+
 # Start and enable Apache2
 systemctl start apache2
 systemctl enable apache2
@@ -17,6 +25,25 @@ local_ipv4=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/ne
 zone=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/zone")
 project_id=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/project/project-id")
 network_tags=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/tags")
+
+# Fetch VPC and subnet info
+network_name=$(gcloud compute instances describe "$(hostname)" \
+  --zone="$(basename $zone)" \
+  --format="get(networkInterfaces[0].network)" | awk -F'/' '{print $NF}')
+
+subnet_name=$(gcloud compute instances describe "$(hostname)" \
+  --zone="$(basename $zone)" \
+  --format="get(networkInterfaces[0].subnetwork)" | awk -F'/' '{print $NF}')
+
+subnet_mode=$(gcloud compute networks describe "$network_name" \
+  --format="get(subnetMode)")
+
+auto_create_subnets=$(gcloud compute networks describe "$network_name" \
+  --format="get(autoCreateSubnetworks)")
+
+routing_mode=$(gcloud compute networks describe "$network_name" \
+  --format="get(routingConfig.routingMode)")
+
 
 # Create a simple HTML page and include instance details
 cat <<EOF > /var/www/html/index.html
@@ -56,14 +83,10 @@ cat <<EOF > /var/www/html/index.html
   <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
     <div class="w3-display-topleft w3-padding-large w3-xlarge"></div>
     <div class="w3-display-middle w3-center">
-      <iframe src="https://giphy.com/embed/1sv8rIfAtyMsqsqDt8"
-              width="500"
-              height="270"
-              style="border-radius:10px;"
-              frameBorder="0"
-              class="giphy-embed"
-              allowFullScreen>
-      </iframe>
+       <video width="360" height="540" style="border-radius:10px;" controls loop autoplay muted>
+          <source src="https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/4467b2b5-dc57-4be6-bc33-39d92cd4e0f1/dj2qoeb-56c84c1f-cec7-47e3-876c-e3d2cbe2a967.VideoQualities.res_1080p.5b891286139d4474bad9bda6bfecc970.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
       <hr class="w3-border-grey" style="margin:auto;width:40%;margin-top:15px;">
       <h3 class="w3-large w3-center" style="margin-top:15px;">
         <a href="https://github.com/Gwenbleidd32/startup-script-template"
@@ -83,6 +106,15 @@ cat <<EOF > /var/www/html/index.html
       <p><b>Project ID:</b> $project_id</p>
       <p><b>Network Tags:</b> $network_tags</p>
     </div>
+    <div class="w3-display-topleft w3-padding-small transparent-background outlined-text">
+  <h1>My VPC Network Information</h1>
+  <h3></h3>
+  <p><b>VPC Name:</b> $network_name</p>
+  <p><b>Subnet Name:</b> $subnet_name</p>
+  <p><b>Subnet Mode:</b> $subnet_mode</p>
+  <p><b>Auto Create Subnets:</b> $auto_create_subnets</p>
+  <p><b>Routing Mode:</b> $routing_mode</p>
+</div>
   </div>
 </body>
 </html>
