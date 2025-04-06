@@ -89,11 +89,11 @@ cat <<EOF > /var/www/html/index.html
       </video>
       <hr class="w3-border-grey" style="margin:auto;width:40%;margin-top:15px;">
       <h3 class="w3-large w3-center" style="margin-top:15px;">
-        <a href="https://github.com/Gwenbleidd32/startup-script-template"
+        <a href="https://assets.vogue.com/photos/5d0d1b00cdcf853aa0de12c4/master/w_2560%2Cc_limit/00-story-lizzo.jpg"
            class="w3-button w3-transparent w3-border w3-border-white w3-round-large w3-text-white"
            style="margin-bottom:0px;"
            target="_blank">
-          Source Code
+           Big Booty Latinas
         </a>
       </h3>
     </div>
