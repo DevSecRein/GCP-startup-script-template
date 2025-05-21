@@ -1,4 +1,3 @@
-#Thanks to Remo
 #!/bin/bash
 # Update and install Apache2
 apt update
@@ -26,64 +25,9 @@ zone=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/zone")
 project_id=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/project/project-id")
 network_tags=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/tags")
 
-#Wait until gcloud works (handle boot race conditions)
-until gcloud compute instances describe "$(hostname)" --zone="$(basename $zone)" --project="$project_id" --format="value(name)" &>/dev/null; do
-  echo "Waiting for gcloud API to be ready..."
-  sleep 2
-done
+rm -f /var/www/html/index.html
 
-#Use a single gcloud call to get all instance info
-INSTANCE_INFO=$(gcloud compute instances describe "$(hostname)" \
-  --zone="$(basename $zone)" \
-  --project="$project_id" \
-  --format=json)
-
-#Extract VPC and subnet info
-network_url=$(echo "$INSTANCE_INFO" | grep -o '"network": *"[^"]*"' | cut -d'"' -f4)
-subnet_url=$(echo "$INSTANCE_INFO" | grep -o '"subnetwork": *"[^"]*"' | cut -d'"' -f4)
-
-network_name=$(basename "$network_url")
-subnet_name=$(basename "$subnet_url")
-
-#Get additional network info
-subnet_mode=$(gcloud compute networks describe "$network_name" \
-  --project="$project_id" --format="value(subnetMode)" 2>/dev/null || echo "N/A")
-
-auto_create_subnets=$(gcloud compute networks describe "$network_name" \
-  --project="$project_id" --format="value(autoCreateSubnetworks)" 2>/dev/null || echo "N/A")
-
-routing_mode=$(gcloud compute networks describe "$network_name" \
-  --project="$project_id" --format="value(routingConfig.routingMode)" 2>/dev/null || echo "N/A")
-
-#Log variables (optional, for debugging)
-echo "Zone: $zone"
-echo "Project ID: $project_id"
-echo "Network: $network_name"
-echo "Subnet: $subnet_name"
-echo "Subnet Mode: $subnet_mode"
-echo "Auto Create Subnets: $auto_create_subnets"
-echo "Routing Mode: $routing_mode"
-
-# Fetch VPC and subnet info
-network_name=$(gcloud compute instances describe "$(hostname)" \
-  --zone="$(basename $zone)" \
-  --format="get(networkInterfaces[0].network)" | awk -F'/' '{print $NF}')
-
-subnet_name=$(gcloud compute instances describe "$(hostname)" \
-  --zone="$(basename $zone)" \
-  --format="get(networkInterfaces[0].subnetwork)" | awk -F'/' '{print $NF}')
-
-subnet_mode=$(gcloud compute networks describe "$network_name" \
-  --format="get(subnetMode)")
-
-auto_create_subnets=$(gcloud compute networks describe "$network_name" \
-  --format="get(autoCreateSubnetworks)")
-
-routing_mode=$(gcloud compute networks describe "$network_name" \
-  --format="get(routingConfig.routingMode)")
-
-
-# Create a simple HTML page and include instance details
+# Create the HTML page
 cat <<EOF > /var/www/html/index.html
 <!DOCTYPE html>
 <html>
@@ -152,6 +96,7 @@ cat <<EOF > /var/www/html/index.html
       <p><b>Subnet Mode:</b> $subnet_mode</p>
       <p><b>Auto Create Subnets:</b> $auto_create_subnets</p>
       <p><b>Routing Mode:</b> $routing_mode</p>
+    </p>
     </div>
   </div>
 </body>
