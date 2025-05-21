@@ -81,10 +81,10 @@ cat <<EOF > /var/www/html/index.html
 </head>
 <body>
   <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
-    <div class="w3-display-topleft w3-padding-large w3-xlarge"></div>
+    <div class="w3-display-bottomright w3-padding-large w3-xlarge"></div>
     <div class="w3-display-middle w3-center">
       <video width="360" height="540" style="border-radius:10px;" controls loop autoplay muted>
-          <source src="https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/4467b2b5-dc57-4be6-bc33-39d92cd4e0f1/dj2qoeb-56c84c1f-cec7-47e3-876c-e3d2cbe2a967.VideoQualities.res_1080p.5b891286139d4474bad9bda6bfecc970.mp4" type="video/mp4">
+          <source src="https://i.imgur.com/GPli6mO.mp4" type="video/mp4">
           Your browser does not support the video tag.
       </video>
       <hr class="w3-border-grey" style="margin:auto;width:40%;margin-top:15px;">
