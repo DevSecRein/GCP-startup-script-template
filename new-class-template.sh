@@ -26,6 +26,44 @@ zone=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/zone")
 project_id=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/project/project-id")
 network_tags=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/tags")
 
+#Wait until gcloud works (handle boot race conditions)
+until gcloud compute instances describe "$(hostname)" --zone="$(basename $zone)" --project="$project_id" --format="value(name)" &>/dev/null; do
+  echo "Waiting for gcloud API to be ready..."
+  sleep 2
+done
+
+#Use a single gcloud call to get all instance info
+INSTANCE_INFO=$(gcloud compute instances describe "$(hostname)" \
+  --zone="$(basename $zone)" \
+  --project="$project_id" \
+  --format=json)
+
+#Extract VPC and subnet info
+network_url=$(echo "$INSTANCE_INFO" | grep -o '"network": *"[^"]*"' | cut -d'"' -f4)
+subnet_url=$(echo "$INSTANCE_INFO" | grep -o '"subnetwork": *"[^"]*"' | cut -d'"' -f4)
+
+network_name=$(basename "$network_url")
+subnet_name=$(basename "$subnet_url")
+
+#Get additional network info
+subnet_mode=$(gcloud compute networks describe "$network_name" \
+  --project="$project_id" --format="value(subnetMode)" 2>/dev/null || echo "N/A")
+
+auto_create_subnets=$(gcloud compute networks describe "$network_name" \
+  --project="$project_id" --format="value(autoCreateSubnetworks)" 2>/dev/null || echo "N/A")
+
+routing_mode=$(gcloud compute networks describe "$network_name" \
+  --project="$project_id" --format="value(routingConfig.routingMode)" 2>/dev/null || echo "N/A")
+
+#Log variables (optional, for debugging)
+echo "Zone: $zone"
+echo "Project ID: $project_id"
+echo "Network: $network_name"
+echo "Subnet: $subnet_name"
+echo "Subnet Mode: $subnet_mode"
+echo "Auto Create Subnets: $auto_create_subnets"
+echo "Routing Mode: $routing_mode"
+
 # Fetch VPC and subnet info
 network_name=$(gcloud compute instances describe "$(hostname)" \
   --zone="$(basename $zone)" \
@@ -81,7 +119,7 @@ cat <<EOF > /var/www/html/index.html
 </head>
 <body>
   <div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
-    <div class="w3-display-bottomright w3-padding-large w3-xlarge"></div>
+    <div class="w3-display-topleft w3-padding-large w3-xlarge"></div>
     <div class="w3-display-middle w3-center">
       <video width="360" height="540" style="border-radius:10px;" controls loop autoplay muted>
           <source src="https://i.imgur.com/GPli6mO.mp4" type="video/mp4">
@@ -106,7 +144,7 @@ cat <<EOF > /var/www/html/index.html
       <p><b>Project ID:</b> $project_id</p>
       <p><b>Network Tags:</b> $network_tags</p>
     </div>
-    <div class="w3-display-topleft w3-padding-small transparent-background outlined-text">
+    <div class="w3-display-bottomright w3-padding-small transparent-background outlined-text">
       <h1>My VPC Network Information</h1>
       <h3></h3>
       <p><b>VPC Name:</b> $network_name</p>
