@@ -25,8 +25,6 @@ zone=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/zone")
 project_id=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/project/project-id")
 network_tags=$(curl -H "${METADATA_FLAVOR_HEADER}" -s "${METADATA_URL}/instance/tags")
 
-rm -f /var/www/html/index.html
-
 # Create the HTML page
 cat <<EOF > /var/www/html/index.html
 <!DOCTYPE html>
